@@ -73,6 +73,24 @@
 
 <!-- copy_over_N_files.py在压缩包中需要删除 -->
 
+
+### Burgers equation
+<p align="center">
+  <p float="left">
+     <img src="pics/original_BE.gif">
+     <a href="pics/original_BE.gif"><strong>Original Burgers equation</strong></a>
+     <!-- <img src="pics/FPC_SFC_CAE_64.gif">
+     <a href="pics/FPC_SFC_CAE_64.gif"><strong>FPC SFC-CAE 64 variables</strong></a> -->
+     <img src="pics/FCAE_BE_2variable.gif">
+     <a href="pics/FCAE_BE_2variable.gif"><strong>Burgers equation FC-AE 2 variables</strong></a>
+     <img src="pics/CAE_BE_2variable.gif">
+     <a href="pics/CAE_BE_2variable.gif"><strong>Burgers equation CAE 2 variables</strong></a>
+     <img src="pics/SVDAE_BE_2variable.gif">
+     <a href="pics/SVDAE_BE_2variable.gif"><strong>Burgers equation SVD-AE 2 variables</strong></a>
+  </p>
+</p>
+
+
 ### FPC
 <p align="center">
   <p float="left">
