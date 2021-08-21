@@ -15,16 +15,16 @@ for element in required:
     
 
 
-if sys.platform == 'win32' or sys.platform == 'cygwin' or sys.platform == 'msys':
-   # on windows
-   compile_command = 'f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new --compiler=mingw32'
-elif sys.platform == 'linux' or sys.platform == 'linux2':
-   # on linux
-   compile_command = 'python3 -m numpy.f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new'
+# if sys.platform == 'win32' or sys.platform == 'cygwin' or sys.platform == 'msys':
+#    # on windows
+#    compile_command = 'f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new --compiler=mingw32'
+# elif sys.platform == 'linux' or sys.platform == 'linux2':
+#    # on linux
+#    compile_command = 'python3 -m numpy.f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new'
 
 
 setup(
-    name = 'acse-9-independent-research-project-fy120',
+    name = 'ACSE9',
     version ='1.0',
     description = 'A comparison of dimensionality reduction methods '
                  +' for fluid flow problems focusing on hierarchical autoencoders',
@@ -32,6 +32,7 @@ setup(
     author_email='fan.yang20@imperial.ac.uk',
     install_requires=reqs,
     test_suite='tests',
+    packages=['fpc_methods']
 
 
 
