@@ -29,14 +29,14 @@
 
 <p align="center">
   <a href="https://github.com/acse-fy120/acse-9-independent-research-project-fy120/blob/main/pics/HAE.jpg">
-    <img src="pics/HAE architecture.jpg">
+    <img src="pics/HAE.jpg">
     <figcaption> Achitechture of hierarchical autoencoder </figcaption>
   </a>
 </p>
 
 <p align="center">
   <a href="https://github.com/acse-fy120/acse-9-independent-research-project-fy120/blob/main/pics/SAE.jpg">
-    <img src="pics/SAE architecture.jpg">
+    <img src="pics/SAE.jpg">
     <figcaption> Achitechture of sequential autoencoder </figcaption>
   </a>
 </p>
