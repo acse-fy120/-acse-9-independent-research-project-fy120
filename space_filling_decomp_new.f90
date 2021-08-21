@@ -14,6 +14,99 @@
 !         contains
 
           PROGRAM MAIN
+          IMPLICIT NONE 
+          LOGICAL DISC
+          PARAMETER(DISC=.TRUE.)
+          IF(DISC) THEN ! solve a problem from disc and then output to disc 
+            CALL MAIN1
+          ELSE ! solve a structured mesh problem
+            CALL MAIN2
+          ENDIF
+          stop 
+          END PROGRAM MAIN
+
+
+
+          SUBROUTINE MAIN1
+          IMPLICIT NONE 
+          INTEGER iuse_starting_node, graph_trim, ncurve, nonods, ncola
+          integer, allocatable :: fina(:),cola(:)
+          integer, allocatable :: ncurve_whichd(:,:), ncurve_space_fill_curve_numbering(:,:)
+! read from disc...
+          print *,'reading file_cola'
+          open(27,file='file_cola')
+          read(27,*) iuse_starting_node, graph_trim, ncurve, nonods, ncola
+          allocate( fina(nonods+1), cola(ncola) ) 
+          read(27,*) fina(1:nonods+1)
+          read(27,*) cola(1:ncola) 
+          close(27)
+          print *,'finished reading file_cola'
+          print *,'iuse_starting_node, graph_trim, ncurve, nonods, ncola:', &
+                   iuse_starting_node, graph_trim, ncurve, nonods, ncola
+          print *,'fina(1:10):',fina(1:10)
+          print *,'cola(1:10):',cola(1:10)
+
+!            ncurve=2
+!            iuse_starting_node=0 ! use starting node from end of previous space filling curve if >0
+! -ve graph_trim then use matrix to deter decomposition.
+! -3 works well. 4 also works welll (default) 
+!            graph_trim=-10 ! graph trimming options abs >3 <9 max trim  and =(0 or 10) no trim (=1 is best for trimming)
+            allocate( ncurve_whichd(nonods,ncurve), ncurve_space_fill_curve_numbering(nonods,ncurve) )
+            call ncurve_python_subdomain_space_filling_curve( ncurve_whichd,  &
+              ncurve_space_fill_curve_numbering,  cola,fina, iuse_starting_node, graph_trim, ncurve, nonods,ncola)
+
+            call write_disc_curve(ncurve_whichd, ncurve_space_fill_curve_numbering, ncurve, nonods)
+
+          stop 
+          END SUBROUTINE MAIN1
+
+
+
+          subroutine write_disc_cola(cola, fina, starting_node, graph_trim, ncurve, nonods, ncola)
+!*******************************************************************************************************
+          implicit none
+          INTEGER, INTENT(IN) :: starting_node, graph_trim, ncurve, nonods, ncola
+          INTEGER, INTENT(in) :: cola(ncola),fina(nonods+1)
+
+          open(27,file='file_cola')
+          write(27,*) starting_node, graph_trim, ncurve, nonods, ncola
+          write(27,*) fina(1:nonods+1)
+          write(27,*) cola(1:ncola) 
+          close(27)
+          end subroutine write_disc_cola
+
+
+
+          subroutine read_disc_curve(ncurve_whichd, ncurve_space_fill_curve_numbering, ncurve, nonods)
+!*******************************************************************************************************
+          implicit none
+          INTEGER, INTENT(IN) :: ncurve, nonods
+          INTEGER, INTENT(out) :: ncurve_whichd(nonods,ncurve)
+          INTEGER, INTENT(out) :: ncurve_space_fill_curve_numbering(nonods,ncurve)
+          open(27,file='file_curve')
+          ! read from disc
+             read(27,*) ncurve_whichd 
+             read(27,*) ncurve_space_fill_curve_numbering
+          close(27)
+          end subroutine read_disc_curve
+
+
+          subroutine write_disc_curve(ncurve_whichd, ncurve_space_fill_curve_numbering, ncurve, nonods)
+!*******************************************************************************************************
+          implicit none
+          INTEGER, INTENT(IN) :: ncurve, nonods
+          INTEGER, INTENT(in) :: ncurve_whichd(nonods,ncurve)
+          INTEGER, INTENT(in) :: ncurve_space_fill_curve_numbering(nonods,ncurve)
+          open(27,file='file_curve')
+          ! output to disc
+             write(27,*) ncurve_whichd
+             write(27,*) ncurve_space_fill_curve_numbering
+          close(27)
+          end subroutine write_disc_curve
+
+
+
+          SUBROUTINE MAIN2
 !          use procs127, only : TEST_R_I, PYTHON_SET_UP_RECBIS 
           IMPLICIT NONE 
 
@@ -21,6 +114,7 @@
 !         integer, parameter :: nx=1560, ny=1200
 !         integer, parameter :: nx=100, ny=1
          integer, parameter :: nx=16, ny=16
+!         integer, parameter :: nx=128, ny=128
 !         integer, parameter :: nonods=nx*ny, nsplt=8
 !         integer, parameter :: nonods=nx*ny, nsplt=12
          integer, parameter :: nonods=nx*ny
@@ -313,7 +407,8 @@
 
 
           STOP
-          END PROGRAM MAIN
+!          END PROGRAM MAIN
+          END SUBROUTINE MAIN2
 ! 
 ! 
 ! Python interface: 
@@ -321,8 +416,6 @@
 ! = dg_to_cty_sparcity( provided_dg_2_cty, findm_dg,colm_dg, coordinates_dg, provided, provided_nonods_cty, ncolm_dg, nonods_dg ) 
       subroutine dg_to_cty_sparcity( dg_2_cty, no_dg_nods_at_cty_nods, findm_cty,colm_cty,ncolm_cty, nonods_cty, &
              provided_dg_2_cty, findm_dg,colm_dg, coordinates_dg, provided, provided_nonods_cty, ncolm_dg, nonods_dg ) 
-!      subroutine dg_to_cty_sparcity(  &
-!             provided_dg_2_cty, findm_dg,colm_dg, coordinates_dg, provided, provided_nonods_cty, ncolm_dg, nonods_dg ) 
 ! *************************************************************************************
 ! ****This sub calculates the sparcity of the cty mesh from the dg mesh sparcity ****** 
 ! *************************************************************************************
@@ -352,10 +445,6 @@
       integer, intent(out) :: no_dg_nods_at_cty_nods(nonods_dg) ! no_cty_nods_at_dg_nods(cty_nod) =no of DG nodes that share a cty nod (cty_nod)
       integer, INTENT(OUT) :: findm_cty(nonods_dg+1),colm_cty(ncolm_dg)
       integer, INTENT(OUT) :: nonods_cty, ncolm_cty
-!      integer :: dg_2_cty(nonods_dg) ! dg node to cty node
-!      integer :: no_dg_nods_at_cty_nods(nonods_dg) ! no_cty_nods_at_dg_nods(cty_nod) =no of DG nodes that share a cty nod (cty_nod)
-!      integer :: findm_cty(nonods_dg+1),colm_cty(ncolm_dg)
-!      integer :: nonods_cty, ncolm_cty
 ! Local variables
       real toler
       parameter(toler=1.e-5) 
@@ -369,19 +458,11 @@
       logical found
 
       mx_i_list=10000
-
-      print *, 'inside dg_to_cty_sparcity'
-
-      print *, 'provided_nonods_cty', provided_nonods_cty
-      print *, 'provided_dg_2_cty', shape(provided_dg_2_cty)
-
       allocate(i_list(mx_i_list))
 ! form dg_2_cty...
       if(provided.ne.0) then
          nonods_cty=provided_nonods_cty
          dg_2_cty(1:nonods_dg) = provided_dg_2_cty(1:nonods_dg)
-         print *, 'dg_2_cty (provided), min and max:', minval(dg_2_cty), maxval(dg_2_cty)
-
       else ! if(provided) then
          dg_2_cty(:)=0
 
@@ -420,9 +501,6 @@
       no_dg_nods_at_cty_nods=0 !no_dg_nods_at_cty_nods(1:nonods_cty)=0
       do i_dg_nod=1,nonods_dg
          i_cty_nod = dg_2_cty(i_dg_nod)
-         if ((i_cty_nod < 1).or.(i_cty_nod > nonods_cty)) then
-             print *, 'i_dg_nod', i_dg_nod, 'i_cty_nod', i_cty_nod
-         endif
          no_dg_nods_at_cty_nods(i_cty_nod) = no_dg_nods_at_cty_nods(i_cty_nod) +1 
       end do
 ! 
@@ -431,9 +509,6 @@
       no_cty_nods_surrounded_by_dg_nods(:) = 0
       do i_dg_nod=1,nonods_dg
          i_cty_nod = dg_2_cty(i_dg_nod)
-         if ((i_cty_nod < 1).or.(i_cty_nod > nonods_cty)) then
-             print *, 'i_cty_nod', i_cty_nod, 'i_dg_nod', i_dg_nod
-         endif 
          no_cty_nods_surrounded_by_dg_nods(i_cty_nod) = no_cty_nods_surrounded_by_dg_nods(i_cty_nod) &
                  + findm_dg(i_dg_nod+1)-findm_dg(i_dg_nod) 
       end do
@@ -481,19 +556,6 @@
 ! perform bubble sort to sort each row in increasing node order. 
          call gem_ibuble(colm_cty( findm_cty(i_cty_nod) : findm_cty(i_cty_nod+1)-1 ),nrow )
       end do
-
-
-
-      print *, 'nonods_cty,', nonods_cty, ' ncolm_cty', ncolm_cty 
-      print *, 'dg_2_cty - shape', shape(dg_2_cty),'min' , minval(dg_2_cty), 'max', maxval(dg_2_cty)
-      print *, 'no_dg_nods_at_cty_nods - shape', shape(no_dg_nods_at_cty_nods),'min' , &
-                minval(no_dg_nods_at_cty_nods), 'max', maxval(no_dg_nods_at_cty_nods)
-      print *, 'findm_cty - shape', shape(findm_cty),'min' , minval(findm_cty), 'max', maxval(findm_cty)
-      print *, 'colm_cty - shape', shape(colm_cty),'min' , minval(colm_cty), 'max', maxval(colm_cty)  
-
-
-      print *, 'leaving ...'
-
 !       
       end subroutine dg_to_cty_sparcity
 
@@ -584,6 +646,9 @@
 ! end set up simple search***************************
 
       d3=  (   (maxval(x_all(3,:))-minval(x_all(3,:))) > 1.e-8   ) ! is this a 2d or 3d simulation.
+!      print *,'d3,num_z:',d3,num_z
+!      stop 282
+!      d3= ( num_z > 1) 
       ndim=2; if(d3) ndim=3 ! number of dimensions - 2d or 3d
       nloc=ndim+1 ! no of local nodes per element
       nsur=ndim+1 ! no of elements surround an element
@@ -621,7 +686,8 @@
          do count2=fin_search(isearch), fin_search(isearch+1) - 1
             kk = col_search(count2) 
 ! Find close nodes
-            if(sum( (x_all(:,k)-x_all(:,kk))* (x_all(:,k)-x_all(:,kk)) )< 1.e-3*min_norm_dist ) then
+!            if(sum( (x_all(:,k)-x_all(:,kk))* (x_all(:,k)-x_all(:,kk)) )< 1.e-3*min_norm_dist ) then
+            if(sum( abs(x_all(:,k)-x_all(:,kk)) )< (1.e-3)*min_norm_dist ) then
                if(k.ne.kk) then
                   count=count+1
                   COLM0(count)=kk
@@ -719,6 +785,7 @@
                   
       return
       end subroutine form_spare_matric_from_pts
+! 
 ! 
 ! 
 
@@ -885,6 +952,7 @@
           real, ALLOCATABLE :: a(:)
 
 ! graph trimming options
+!          print *,'just inside ncurve_python_subdomain_space_filling_curve'
           no_trim=.false.; trimmed_graph_for_decomposition_only=.false.; trimmed_graph_for_reorder_only=.false.
           duplicate=.false.; got_a_matrix=.false.
           if((abs(graph_trim)==0).or.(abs(graph_trim)==10)) no_trim=.true.
@@ -910,6 +978,7 @@
                 end do
              end do
           endif
+!          print *,'here 1'
 
           allocate(fina2(nonods+1),fina3(nonods+1), cola2(iexpand*ncola),cola3(iexpand*ncola) )
           allocate(new2old(nonods), old_nod_valancy(nonods) )
@@ -924,25 +993,30 @@
 !             print *,'--icurve=',icurve 
 
              if(no_trim) then
+!               print *,'here 1.1'
                 call python_subdomain_space_filling_curve( ncurve_whichd(:,icurve),  &
                  ncurve_space_fill_curve_numbering(:,icurve), a, cola,fina, cola,fina, &
                  starting_node, ncola, na, ncola, nonods)
              else if(trimmed_graph_for_decomposition_only) then
 ! original trim - only trim decomposition...
+!               print *,'here 1.2'
                 call python_subdomain_space_filling_curve( ncurve_whichd(:,icurve),  &
                  ncurve_space_fill_curve_numbering(:,icurve), a, cola,fina, cola2,fina2, & 
                  starting_node, ncola2, na, ncola, nonods)
              else if(trimmed_graph_for_reorder_only) then
 ! otherway around -only trim reordering...
+!               print *,'here 1.3'
                 call python_subdomain_space_filling_curve( ncurve_whichd(:,icurve),  &
                  ncurve_space_fill_curve_numbering(:,icurve), a, cola2,fina2, cola,fina, &
                  starting_node, ncola, na, ncola2, nonods)
 
              else ! original method - trim decomposition and re-ordering...
+!               print *,'here 1.4'
                 call python_subdomain_space_filling_curve( ncurve_whichd(:,icurve),  &
                  ncurve_space_fill_curve_numbering(:,icurve), a, cola2,fina2, cola2,fina2, &
                  starting_node, ncola2, na, ncola2, nonods)
              endif
+!               print *,'here 2-1'
 ! take away the edges from cola2,fina2 which have space filling curve icurve associated with them
              if(icurve.ne.ncurve) then
 ! calculate valancy
@@ -975,6 +1049,7 @@
                    
 ! trim down the graph or expand it...
 !             print *,'old_nod_valancy:',old_nod_valancy
+!                print *,'here 2'
                 count3=0
                 do old_nod=1,nonods
                    new_nod1 = ncurve_space_fill_curve_numbering(old_nod,icurve) 
@@ -1123,7 +1198,7 @@
 
 
 
-
+  
           subroutine python_subdomain_space_filling_curve( whichd,  &
             space_fill_curve_numbering, a,  cola,fina, cola2,fina2, starting_node, ncola2, na, ncola, nonods)
 ! *******************************************************************************************************
@@ -1453,8 +1528,10 @@
           INTEGER, INTENT(in) :: cola(ncola),fina(nonods+1)
           INTEGER, INTENT(inout) :: whichd(nonods)
 ! local variables...
-          integer count,nod,col, isub, jsub, new_nod, level, nlevel, ilevel, Nsplt, accum, ii, ndom
-          integer lcount, iisub,iloop, iii, across, inlev, lndom, count2, ntree, sub, super_step, half_super_step
+          integer count,nod,col, isub, jsub, new_nod
+          integer level, nlevel, ilevel, Nsplt, accum, ii, ndom
+          integer lcount, iisub,iloop, iii, across, inlev, lndom
+          integer count2, ntree, sub, super_step, half_super_step
           integer istart, iend, its, max_in_sub, start_level
           integer min_sub_neigh(2), min_sub_neigh2(2), min_val(2) 
           logical swap, found_starting_node(2), got_starting_node
@@ -1468,6 +1545,7 @@
           allocate(count_in_sub(nsub) ) 
 
 ! calculate nlevel for nested bisection...
+          nlevel=0
           do ilevel=1,1000
 !             print *,'ilevel,nsub,2**ilevel:',ilevel,nsub,2**ilevel
              if(2**ilevel>=nsub) then
@@ -1475,6 +1553,7 @@
                 exit
              endif
           end do
+          if(nlevel==0) stop 22
 !          print *,'nlevel,nsub,2**nlevel=',nlevel,nsub,2**nlevel
 
           count_in_sub=0
@@ -2197,11 +2276,13 @@
         if(got_starting_node) then ! make sure starting node is node 1 in new ordering. 
            new_nod1=1
            old_nod1=new2old(new_nod1)
+           new_nod2=0
            if(old_nod1.ne.starting_node) then !swap over but find the node to swap with 
               do new_nod=1,nonods
                  old_nod=new2old(new_nod)
                  if( old_nod==starting_node ) new_nod2=new_nod
               end do ! do new_nod=1,nonods
+              if(new_nod2==0) stop 2921
               old_nod1=new2old(new_nod1)
               old_nod2=new2old(new_nod2)
               space_fill_curve_numbering(old_nod1)=new_nod2
@@ -2789,7 +2870,7 @@
 
 ! SET_UP_RECBIS IS A SIMPLIFIED INTERFACE FOR IT **************************
 
-!
+! 
 !
        SUBROUTINE python_set_up_recbis(WHICHD0, SPLEVS0,FINA0,COLA0, &
                      wnod,a, havwnod,havmat,iexact, NSPLT,NCOLA,NNOD,na) 
@@ -2866,14 +2947,18 @@
        SPLEVS(1:NSPLT) = SPLEVS0(1:NSPLT)
      endif
 !         print *,'-before SET_UP_RECBIS a:',a
+!         print *,'before SET_UP_RECBIS IN_PYTHON:',IN_PYTHON
        
        CALL SET_UP_RECBIS(SPLEVS,NSPLT,NDOM, &
                 &  FINA,COLA,NCOLA,NNOD,WHICHD, havwnod,WNOD,exact, havmat,a)
+!         print *,'after SET_UP_RECBIS'
      if(IN_PYTHON) then
        WHICHD0(1:NNOD) = WHICHD(1:NNOD) - 1
      else
        WHICHD0(1:NNOD) = WHICHD(1:NNOD)
      endif
+!         print *,'after SET_UP_RECBIS IN_PYTHON:',IN_PYTHON
+!          stop 282
        
        END SUBROUTINE python_set_up_recbis
 !
@@ -2918,10 +3003,10 @@
 ! LOCAL VARIABES...
       INTEGER NSUBAL,MAXNLA,MMXTOT
       INTEGER MULLEV
-      INTEGER MXNSPL,MXNTRE,NCHAIN,NRMEM
+      INTEGER MXNSPL,MXNTRE,NCHAIN
       PARAMETER(MXNSPL=40,MXNTRE=1000)
          INTEGER, DIMENSION(:), ALLOCATABLE :: LWICHD
-         INTEGER, DIMENSION(:), ALLOCATABLE :: FITREE,TREE
+         INTEGER, DIMENSION(:), ALLOCATABLE :: FITREE
          REAL, DIMENSION(:), ALLOCATABLE :: SUBALA,LSUBAL
          REAL ALPHA,LODBAL,BETA,TOLER
          REAL, DIMENSION(:), ALLOCATABLE :: X,Y,LX,LY
@@ -2930,7 +3015,7 @@
          REAL, DIMENSION(:), ALLOCATABLE :: LA
          INTEGER, DIMENSION(:), ALLOCATABLE :: LCOLA,LFINA
 !
-        REAL, DIMENSION(:), ALLOCATABLE :: RMEM
+!        REAL, DIMENSION(:), ALLOCATABLE :: RMEM
         REAL, DIMENSION(:), ALLOCATABLE :: LWNOD
         INTEGER, DIMENSION(:), ALLOCATABLE :: Q,QTEMP
         INTEGER, DIMENSION(:), ALLOCATABLE :: MAP
@@ -2938,25 +3023,18 @@
 !
         LOGICAL EXACT
 
-        MMXTOT=max(6*NNOD,1000)
-        MAXNLA=3*NCOLA
+!          print *,'just in SET_UP_RECBIS'
 
-        NRMEM=100*NNOD
+        MMXTOT=max(6*NNOD,1000)
+!        MMXTOT=max(10*NNOD,1000)
+        MAXNLA=3*NCOLA
+!        MAXNLA=5*NCOLA
+
+!        NRMEM=100*NNOD
         NSUBAL=NNOD
 
         !print *,'help1' 
         !print *,'nrmem,nNOD:',nrmem,nNOD
-
-
-        ALLOCATE(X(NNOD),Y(NNOD),Q(NNOD),QTEMP(NNOD),MAP(NNOD), &
-     &          LX(MMXTOT),LY(MMXTOT),LWNOD(MMXTOT),LA(NCOLA*3*havmat)) 
-        ALLOCATE(RMEM(NRMEM),SUBALA(NSUBAL),LSUBAL(MXNTRE))
-        ALLOCATE(LCOLA(MAXNLA),LFINA(MMXTOT+MULLEV)) 
-        ALLOCATE(LWICHD(MMXTOT),FITREE(MXNSPL+2),TREE(MXNTRE))
-        X=0.0; Y=0.0
-
-      
-        SUBALA(:)=1.0
         TOLER=1.E-4
 !        NCHAIN=3000
         NCHAIN=300
@@ -2966,28 +3044,54 @@
         LODBAL=1.0
 !        LODBAL=10.0
 !        MULLEV=4
-        MULLEV=6
+        MULLEV=8
+!        MULLEV=6
+!        print *,'here1 nnod:',nnod
+
+        ALLOCATE(Q(NNOD),QTEMP(NNOD),MAP(NNOD)) 
+!        print *,'here1.1'
+        ALLOCATE(X(NNOD),Y(NNOD))
+!        print *,'here1.2'
+        ALLOCATE(LX(MMXTOT),LY(MMXTOT),LWNOD(MMXTOT),LA(NCOLA*3*havmat)) 
+!        print *,'here2 nsubal,mxntre:',nsubal,mxntre
+!        ALLOCATE(RMEM(NRMEM),SUBALA(NSUBAL),LSUBAL(MXNTRE))
+        ALLOCATE(SUBALA(NSUBAL),LSUBAL(MXNTRE))
+!        print *,'here3'
+        ALLOCATE(LCOLA(MAXNLA),LFINA(MMXTOT+MULLEV)) 
+!        print *,'here4'
+        ALLOCATE(LWICHD(MMXTOT),FITREE(MXNSPL+2))
+!        print *,'here5'
+        X=0.0; Y=0.0
+
+      
+!        print *,'here6'
+        SUBALA(:)=1.0
+!        print *,'here7'
 !        A=1.0
-        LA=1.0
+        LA(:)=1.0
+!        print *,'here8'
         LWNOD(1:NNOD) = WNOD(1:NNOD) 
 !          stop 282 ! in here
 !          print *,'before recbis a:',a
+!          print *,'before recbis :'
 !
          CALL RECBIS(SPLEVS,NSPLT,MULLEV,  &
-     &           RMEM,NRMEM,  &
+!     &           RMEM,NRMEM,  &
      &           FINA,COLA,A,NCOLA,NNOD,MMXTOT,NDOM,WHICHD, &
      &           LFINA,LCOLA,LA,MAXNLA, &
      &           NSUBAL, &
      &           LWICHD,MAP  ,WNOD, LWNOD,  Q,QTEMP, &
      &           SUBALA,EXACT,ALPHA,LODBAL,BETA,TOLER,NCHAIN, &
      &           X,Y,LX,LY,HAVMAT, HAVWNOD )
+!          print *,'after recbis :'
 
          RETURN
-         END
+         END SUBROUTINE SET_UP_RECBIS
 !
 !
 !
-      SUBROUTINE RECBIS(Splevs,Nsplt,Mullev,Rmem,Nrmem,Fina,Cola,A,     &
+!      SUBROUTINE RECBIS(Splevs,Nsplt,Mullev,Rmem,Nrmem,Fina,Cola,A,     &
+      SUBROUTINE RECBIS(Splevs,Nsplt,Mullev,Fina,Cola,A,     &
                       & Ncola,Nnod,Mmxtot,Ndom,Whichd,Lfina,Lcola,La,   &
                       & Maxnla,Nsubal,Lwichd,Map,Wnod,Lwnod,Q,Qtemp,    &
                       & Subala,Exact,Alpha,Lodbal,Beta,Toler,Nchain,X,Y,&
@@ -2996,7 +3100,7 @@
 !*--RECBIS43
 !*** Start of declarations inserted by SPAG
       INTEGER i , ii , iii , inlev , isub , maxtot , mxnla2 , Nchain ,  &
-            & nlevel , Nrmem , ntree
+            & nlevel , ntree
 !*** End of declarations inserted by SPAG
 ! NB MAP & QTEMP can contain the same storage location.
 ! This sub splits the domain using recursive bisection.
@@ -3015,15 +3119,17 @@
       INTEGER Havmat, HAVWNOD
       INTEGER MXNSPL , MXNTRE , Nsubal , Maxnla , Mmxtot
       INTEGER Mullev
-      PARAMETER (MXNSPL=100,MXNTRE=100000)
+      PARAMETER (MXNSPL=100,MXNTRE=10000000) !MXNTRE=100000)
       INTEGER Splevs(Nsplt)
       INTEGER lcount , sub , level , lnnod , micol , Nsplt , lnod
       INTEGER lncola , across , look , lndom , count , count2
       INTEGER accum
       INTEGER Lwichd(Mmxtot) , Map(Nnod)
-      INTEGER fitree(MXNSPL+2) , tree(MXNTRE)
+      INTEGER fitree(MXNSPL+2) 
+!      integer tree(MXNTRE)
       INTEGER Q(Nnod) , Qtemp(Nnod)
-      REAL Subala(Nsubal) , lsubal(MXNTRE)
+      REAL Subala(Nsubal) 
+!      real lsubal(MXNTRE)
       REAL Alpha , Lodbal , Beta , Toler
       REAL X(Nnod) , Y(Nnod) , Lx(Mmxtot) , Ly(Mmxtot)
 ! MXNTRE=max no of entries in TREE (suggest 1000
@@ -3032,7 +3138,7 @@
 !
       INTEGER Lcola(Maxnla) , Lfina(Mmxtot+Mullev)
 !
-      REAL Rmem(Nrmem)
+!      REAL Rmem(Nrmem)
       REAL Wnod(Nnod) , Lwnod(Mmxtot)
 !
       INTEGER Ncola , Nnod , Ndom
@@ -3042,6 +3148,11 @@
 !
       REAL A(Ncola)
       LOGICAL Exact
+      integer, allocatable:: tree(:)
+      real, allocatable:: lsubal(:)
+
+
+!      print *, 'inside recbis'
 !
 !       stop 92
 !
@@ -3066,6 +3177,8 @@
       fitree(nlevel+1) = count + 1
 !
       ntree = count
+      ALLOCATE( tree(ntree+1), lsubal(ntree+1) )!MXNTRE
+!      ALLOCATE( tree(MXNTRE), lsubal(MXNTRE) )!MXNTRE
 ! Now put entries in TREE
       DO level = nlevel , 1 , -1
          IF ( level.EQ.nlevel ) THEN
@@ -3084,6 +3197,9 @@
             ENDDO
          ENDIF
       ENDDO
+!      print *,'ntree,nlevel',ntree,nlevel
+!      print *,'fitree:' , (fitree(i),i=1,nlevel+1)
+!      print *,'tree:',tree
 !
       !WRITE (*,*) 'splevs:' , Splevs
       !WRITE (*,*) 'fitree:' , (fitree(i),i=1,nlevel+1)
@@ -3112,10 +3228,11 @@
 !      maxtot = max(MIN(4*lnnod,Mmxtot),1000)
 !      maxtot = MIN(4*lnnod,Mmxtot)
       maxtot = Mmxtot
-      !print *,'1-LNNOD,Mmxtot:',LNNOD,Mmxtot
+!      print *,'1-LNNOD,Mmxtot, HAVWNOD:',LNNOD,Mmxtot, HAVWNOD
       CALL SPLIT(Lwichd,maxtot,lnnod,Mullev,lndom,  &
                & Lfina,Lcola,La,Maxnla,Q,Qtemp,Lwnod,lsubal,Exact,Alpha,  &
                & Lodbal,Beta,Toler,Nchain,Lx,Ly,Havmat, HAVWNOD)
+!         print *,'done split'
 !
 !
       DO i = 1 , Nnod
@@ -3178,6 +3295,9 @@
             ENDDO
             Lfina(lnnod+1) = count + 1
             lncola = count
+            if(lncola>Maxnla) then
+               stop 2821
+            endif
 !
             !WRITE (*,*) '*************LNNOD=' , lnnod
 !            maxtot = max(4*lnnod,1000)
@@ -3186,9 +3306,11 @@
       !print *,'2-LNNOD,MAxtot:',LNNOD,MAxtot
             !mxnla2 = MIN(2*lncola,Maxnla)
             mxnla2 = Maxnla
+!            print *,'going in split'
             CALL SPLIT(Lwichd,maxtot,lnnod,Mullev,lndom,     &
                      & Lfina,Lcola,La,mxnla2,Q,Qtemp,Lwnod,lsubal,Exact,&
                      & Alpha,Lodbal,Beta,Toler,Nchain,Lx,Ly,Havmat, HAVWNOD)
+!            print *,'out'
 !
 ! Use MAP again to obtain MAPBAK
             lnod = 0
@@ -3219,7 +3341,8 @@
 !         !print *,'here3'
       ENDDO ! DO level = 2 , nlevel - 1
 !         !print *,'here4 exiting RECBIS'
-      END
+      deallocate( tree, lsubal )
+      END SUBROUTINE RECBIS
 !*==COPYI.spg  processed by SPAG 6.72Dc at 17:05 on 27 Apr 2019
 !
 !
@@ -3345,7 +3468,7 @@
 !*==SPLIT.spg  processed by SPAG 6.72Dc at 17:05 on 27 Apr 2019
  
  
-!
+! 
 !
       SUBROUTINE SPLIT(Whichd,Maxtot,Nonods,Nlevel,Onsubd,   &
                      & Fina,Cola,A,Maxna,Q,Qtemp,Wnod,Subal,Exact,Alpha,&
@@ -3358,6 +3481,11 @@
       INTEGER Havmat
       INTEGER MAX_mxnlev
       PARAMETER(MAX_MXNLEV=100) 
+      LOGICAL MISS_OUT_2NODS,DYNAMIC_NCHAIN
+      PARAMETER(MISS_OUT_2NODS=.TRUE.) ! If we have two nodes or less then assign partition and scip code.
+      PARAMETER(DYNAMIC_NCHAIN=.TRUE.)
+!      PARAMETER(MISS_OUT_2NODS=.false.) ! If we have two nodes or less then assign partition and scip code.
+!      PARAMETER(DYNAMIC_NCHAIN=.false.)
 ! MXNLEV is the maximum number of multi-grid levels. E.G. 4
 ! NLEVEL is now the number of multi-grid levels e.g. set to 4.
 ! NONODS=number of vertices or nodes in the graph to be decomposed.
@@ -3394,20 +3522,33 @@
       LOGICAL Exact
 !      REAL Rmem(Nrmem)
       REAL X(Maxtot) , Y(Maxtot)
+      INTEGER NCHAIN2
 
       INTEGER, DIMENSION(:), ALLOCATABLE :: LIST,whichd_new,whichd_long
       REAL, DIMENSION(:), ALLOCATABLE :: V_NEW,B_NEW,TSCALE_NEW
 
+      IF(MISS_OUT_2NODS) THEN
+         IF(NONODS.LE.2) THEN
+!            PRINT *,'-------SKIPPING DOMAIN DECOMP NONODS=',NONODS
+            if(nonods.ge.1) Whichd(1:nonods)=1
+            IF(NONODS==2) Whichd(NONODS)=2
+            RETURN
+         ENDIF
+      ENDIF
+
       ALLOCATE(LIST(NONODS))
 !         print *,'a:',a ! this a does not have 1000 in it. 
 !          stop 291
+!       print *,'in 1'
 
 !
       CALL FORMA(Whichd,Maxtot,totnod,Nonods,nodlev,ptcola,Nlevel,Fina, &
                & Cola,A,Maxna,na,Whichd,Q,Qtemp,LIST,X,Y,Havmat)
+!       print *,'in 2'
 ! This sub finds the subdomains.
       ALLOCATE(whichd_new(maxtot))
       ALLOCATE(V_NEW(Totnod*Onsubd),B_NEW(Nonods*Onsubd),TSCALE_NEW(NONODS))
+!       print *,'in 3'
 
       !WRITE (*,*) 'totnod,onsubd=' , totnod , Onsubd
 ! !print out all the levels
@@ -3436,6 +3577,11 @@
      ! WRITE (*,*) 'mxnlev,NLEVEL,ALPHA,LODBAL,BETA,TOLER,NCHAIN:' ,     &
      !           & mxnlev , Nlevel , Alpha , Lodbal , Beta , Toler ,     &
      !           & Nchain
+      IF(DYNAMIC_NCHAIN) THEN
+         NCHAIN2=MAX(30,  MIN(300,NONODS/2) )
+      ELSE
+         NCHAIN2=NCHAIN
+      ENDIF
 !
 ! NB V,B,TSCALE are stored in RMEM.
 !        CALL NEUR(WHICHD,WHICHD,V,B,TSCALE,
@@ -3443,9 +3589,11 @@
        if(maxtot.lt.max(totnod,nonods)) stop 3933
        whichd_new(1:totnod)=whichd(1:totnod)
 !      CALL NEUR(Whichd_long,Whichd_new,V_NEW,B_NEW,TSCALE_NEW, nodlev,ptcola,      &
+!         print *,'entering neur'
       CALL NEUR(Whichd,Whichd_new,V_NEW,B_NEW,TSCALE_NEW, nodlev,ptcola,      &
               & totnod,Nonods,Onsubd,Fina,Cola,A,na,Nlevel,Alpha,Lodbal,&
-              & Beta,Toler,Nchain,Havmat,exact, havwnod,wnod)
+              & Beta,Toler,Nchain2,Havmat,exact, havwnod,wnod)
+!         print *,'out of neur'
 ! count no of nodes in each subdomain
       !WRITE (*,*) 'inside split onsubd,nonods:' , Onsubd , Nonods
       DO isub = 1 , Onsubd
@@ -3464,7 +3612,8 @@
 !     &        COLA(PTCOLA(ILEVEL)),MAXNA2,NNOD2,
 !     &        WHICHD(NODLEV(ILEVEL)) )
 !79       CONTINUE
-      END
+      RETURN 
+      END SUBROUTINE SPLIT
 !*==COUDOM.spg  processed by SPAG 6.72Dc at 17:05 on 27 Apr 2019
 !
 !
@@ -3967,8 +4116,8 @@
             iran = INT(rran*REAL(Nnod*Ndom)+1.)
 !
             sub = ((iran-1)/Nnod) + 1
-            Whichd(i) = sub
-            Tempd(i) = sub
+            Whichd(i) = int( sub )
+            Tempd(i) = int( sub )
          ENDDO
       ELSE
          DO i = 1 , Nnod
@@ -4459,6 +4608,7 @@
 !
 ! Choose which part to look at more closely.
 ! find out which sub its in
+         isub=0
          rsum = 0.
          doloop = .TRUE.
          DO sub = 1 , Ndom
@@ -4475,6 +4625,7 @@
          ENDDO
          IF ( doloop ) missed = .TRUE.
 !
+         if(isub==0) stop 8221
          sub = isub
 !            PRPOW=(2.*PRODM2(SUB))**POWER
 !
@@ -4533,6 +4684,7 @@
          IF ( doloop ) missed = .TRUE.
 !
 !            RSUM=RRSUM
+         irnod=0
          doloop = .TRUE.
          start = (sub-1)*Nnod + ((ptpart-1)*Nnod)/Nparts + 1
          finish = (sub-1)*Nnod + (ptpart*Nnod)/Nparts
@@ -4555,6 +4707,7 @@
 !
 ! Have now chosen node IRNOD to be in sub IRSUB
 !            write(*,*)'irnod=',irnod
+         if(irnod==0) stop 921
          Newnod = irnod
          Newsub = sub
          Oldsub = Whichd(Newnod)
@@ -5284,7 +5437,7 @@
 ! SPLIT THE DOMAIN INTO SUBDOMAINS
 !         MMXTOT=2*NNOD
 !         MAXNLA=2*NCOLA
-      mmxtot = MAX(1000,INT(1.5*nnod))
+      mmxtot = MAX(1000,INT(1.75*nnod))
       maxnla = MAX(1000,INT(1.5*Ncola))
       mxcols = Ndom*Ndom
 ! INTEGERS....
@@ -5317,7 +5470,8 @@
       rmem2 = ptrmem
       nrmem2 = Nrmem - rmem2 + 1
 !
-      CALL RECBIS(Splevs,Nsplt,Mullev,Rmem(rmem2),nrmem2,Fina,Cola,A,   &
+!      CALL RECBIS(Splevs,Nsplt,Mullev,Rmem(rmem2),nrmem2,Fina,Cola,A,   &
+      CALL RECBIS(Splevs,Nsplt,Mullev,Fina,Cola,A,   &
                 & Ncola,Nonods,mmxtot,Ndom,Whichd,Imem(lfina),          &
                 & Imem(lcola),Rmem(la),maxnla,Nsubal,Imem(lwichd),      &
                 & Imem(map),Rmem(wnod),Rmem(lwnod),Imem(q),Imem(qtemp), &
@@ -5410,6 +5564,7 @@
       Ptcola(2) = Fina(Nonods+1)
       Na = Ptcola(2) - 1
       DO level = 2 , Nlevel
+!         print *,'level,nlevel:',level,nlevel
 ! Colour nodes on level LEVEL-1
          nnod = Nodlev(level) - Nodlev(level-1)
          maxna2 = Ptcola(level) - Ptcola(level-1)
@@ -5420,9 +5575,11 @@
 !     &                 COLA(PTCOLA(LEVEL-1)),MAXNA2,NNOD)
 !           ENDIF
 !
+!         print *,'before color2' 
          CALL COLOR2(Color(Nodlev(level-1)),ncolor,Q,Qtemp,nnod,        &
                    & Fina(Nodlev(level-1)+level-2),Cola(Ptcola(level-1))&
                    & ,maxna2,zero,quick)
+!         print *,'after color2'
 !
 !
 ! Work out CGRID & NCOLO & NODLEV(LEVEL+1).
@@ -5443,6 +5600,7 @@
          fncola = Ptcola(level) - Ptcola(level-1)
          mxnca = Maxna - Ptcola(level) + 1
          !WRITE (*,*) '999777 LEVEL=' , level
+!         print *,'havmat=',havmat
          IF ( Havmat.EQ.1 ) THEN
             CALL LOCALA(A(Ptcola(level)),A(Ptcola(level-1)),fnods,cnods,&
                       & Cgrid(Nodlev(level-1)),Cola(Ptcola(level)),     &
@@ -5461,6 +5619,7 @@
                       & Y(Nodlev(level-1)),X(Nodlev(level)),            &
                       & Y(Nodlev(level)),Havmat)
          ENDIF
+!          print *,'finished locala'
 !
 !           write(*,*)'JUST AFTER LOCALA call checka'
 !       CALL CHECKA(A(PTCOLA(LEVEL)),
@@ -5468,21 +5627,28 @@
 !     &            COLA(PTCOLA(LEVEL)),NCA,cnods )
 !
          Na = Na + nca
+!       print *,'1'
          Ptcola(level+1) = Ptcola(level) + nca
+!       print *,'2'
          inca = Fina(Nodlev(level)+cnods+level-1)                       &
               & - Fina(Nodlev(level)+level-1)
+!       print *,'3'
          !WRITE (*,*) 'NCA,INCA:' , nca , inca
 !
 !
       ENDDO
+!       print *,'4'
 !
       Totnod = Nodlev(Nlevel+1) - 1
+!       print *,'5'
       IF ( Totnod.GT.Maxtot ) THEN
          !WRITE (*,*) 'MAXTOT.LT.TOTNOD; Totnod,Maxtot:',Totnod,Maxtot
-         STOP
+         print*, 'nlevel,Totnod,Maxtot:',nlevel,Totnod,Maxtot
+         STOP 1121
       ENDIF
+!       print *,'6'
 !
-      END
+      END SUBROUTINE FORMA
 !*==LOCALA.spg  processed by SPAG 6.72Dc at 17:05 on 27 Apr 2019
 !
 !
@@ -5493,7 +5659,7 @@
       IMPLICIT NONE
 !*--LOCALA2500
 !*** Start of declarations inserted by SPAG
-      REAL c2nod
+      integer c2nod
       INTEGER i , iinod , inod , nlist , nod
 !*** End of declarations inserted by SPAG
       logical non_uniform_weights
@@ -5674,6 +5840,11 @@
       INTEGER Whichd(Totnod) , Cgrid(Totnod)
       INTEGER Nodlev(Nlevel+1) , Ptcola(Nlevel+1)
       LOGICAL satur , mixup
+      INTEGER IREPEAT,NREPEAT
+      PARAMETER(NREPEAT=100) 
+      logical miss_out_levels_whichd, balanced, backup_plan
+      parameter(miss_out_levels_whichd=.true.) ! We dont need whichd for the different levels
+      parameter( backup_plan=.true. )  ! try the backup plan...
 ! WHICHD(NOD) can overwrite CGRID to save space.
 ! WHICHD(NOD) contains the subdomain that node NOD is in.
 ! NONODS=number of nodes on the finnest grid level.
@@ -5716,7 +5887,8 @@
          beta2 = Beta
 !
 !
- 50      IF ( ilevel.NE.Nlevel ) THEN
+       DO IREPEAT=1,NREPEAT
+         IF ( ilevel.NE.Nlevel ) THEN
             mixup = .FALSE.
             iileve = ilevel + 1
             fnods = Nodlev(iileve) - Nodlev(iileve-1)
@@ -5762,7 +5934,7 @@
          DO i = istar2 , ifini2
             rmean = rmean + MAX(V(i),1.-V(i))
          ENDDO
-         rmean = rmean/REAL(ifini2-istar2)
+         rmean = rmean/max(REAL(ifini2-istar2),  1.0e-9)
          satur = .TRUE.
          IF ( rmean.LT.0.7 ) satur = .FALSE.
          !WRITE (*,*) 'THE SOLUTION SATURATION :RMEAN=' , rmean
@@ -5771,8 +5943,10 @@
 !
          IF ( .NOT.satur ) THEN
             beta2 = beta2*0.8
-            GOTO 50
+         ELSE 
+            EXIT ! DONT REPEAT ANY MORE
          ENDIF
+       END DO ! DO IREPEAT=1,NREPEAT
 !
 ! *************************************************
 !
@@ -5785,17 +5959,210 @@
 !
 ! MAKE SURE ALL NODES ARE SATURATED ***************.
 ! WORK OUT WHICHD *********************************.
-      DO ilevel = Nlevel , 1 , -1
-         cnods = Nodlev(ilevel+1) - Nodlev(ilevel)
-         icstar = (Nodlev(ilevel)-1)*Onsubd + 1
-         istart = Nodlev(ilevel)
-         CALL FIWICD(V(icstar),Whichd(istart),cnods,Onsubd,exact,havwnod,wnod(istart))
-      ENDDO
+      if(miss_out_levels_whichd) then ! We dont need whichd for the different levels
+!         print *,'£££ making exact nonods:',nonods
+         CALL FIWICD(V(1),Whichd(1),nonods,Onsubd,exact,havwnod,wnod(1),balanced)
+         if(backup_plan) then ! try the backup plan...
+         if(exact) then ! make sure its exact...
+            if(.not.balanced) then ! then form the balance in another way
+            if((onsubd==2).and.(nonods>2)) then
+! remove or add nodes until its exact to within one- alternative backup...
+!               print *,'going into alt_balance_exact'
+               call alt_balance_exact(whichd,nonods,fina,cola,ncola,havwnod,wnod) 
+            endif
+            endif 
+         endif ! if(exact) then
+         endif ! if(backup_plan) then 
+      else
+         DO ilevel = Nlevel , 1 , -1
+!            print *,'ilevel,nlevel,cnods:',ilevel,nlevel,cnods
+            cnods = Nodlev(ilevel+1) - Nodlev(ilevel)
+            icstar = (Nodlev(ilevel)-1)*Onsubd + 1
+            istart = Nodlev(ilevel)
+            CALL FIWICD(V(icstar),Whichd(istart),cnods,Onsubd,exact,havwnod,wnod(istart),balanced)
+         ENDDO
+      endif
 ! *************************************************.
       !WRITE (*,*) 'GOING OUT OF NEUR ONSUBD:' , Onsubd
       RETURN
       END
 !*==CHECKA.spg  processed by SPAG 6.72Dc at 17:05 on 27 Apr 2019
+!
+!
+!
+!
+      subroutine alt_balance_exact(whichd,nonods,fina,cola,ncola,havwnod,wnod_in) 
+! Remove or add nodes until its exact to within one- alternative backup...
+      integer, INTENT(IN) :: nonods, ncola, havwnod
+      integer, INTENT(IN) :: fina(nonods+1), cola(ncola)
+      real, INTENT(IN) :: wnod_in(nonods) 
+      integer, INTENT(inout) :: whichd(nonods)
+! local variables...
+      real w_sub_count, w_sub_count_aim, toler
+      integer nod,its,count,col, count2,col2, nod_keep, valancy_keep, valancy
+      logical more,less,changed
+
+      real, allocatable :: wnod(:)
+
+      allocate(wnod(nonods))
+      if(havwnod.ne.0) then
+         wnod(:)=wnod_in(:)
+      else
+         wnod(:)=1.0
+      endif
+
+      toler=0.25*minval( wnod(1:nonods) ) 
+      w_sub_count=0.0
+      do nod=1,nonods
+         if(whichd(nod)==1) then
+            w_sub_count=w_sub_count+wnod(nod) 
+         else 
+            whichd(nod)=2 
+         endif
+      end do
+      if((w_sub_count<toler).or.(abs(w_sub_count -sum( wnod(1:nonods)) )<toler)) then
+         whichd(:)=2
+         nod=1
+         whichd(nod)=1  
+         w_sub_count = wnod(nod) 
+      endif
+      w_sub_count_aim = sum( wnod(1:nonods) )/2.0  
+!      if(abs(w_sub_count - w_sub_count_aim )<minval( wnod(1:nonods) )+toler) then ! found the best partition
+!      if(abs(w_sub_count - w_sub_count_aim )<toler) then ! found the best partition
+      if(abs(w_sub_count - (2.*w_sub_count_aim-w_sub_count) )<minval( wnod(1:nonods) )+toler) then ! found the best partition
+         less=.true.
+         more=.true.
+      else 
+         less=.false.
+         more=.false.
+      endif
+
+      do its=1,nonods
+         changed=.false.
+         do nod=1,nonods
+
+            if(whichd(nod)==1) then
+               if(w_sub_count<w_sub_count_aim-toler) then
+                  less=.true.
+                  if(.not.more) then
+                     nod_keep=0
+                     valancy_keep=0
+                     do count=fina(nod),fina(nod+1)-1
+                        col=cola(count) 
+                        if(whichd(col)==2) then
+                           valancy=0
+                           do count2=fina(col),fina(col+1)-1
+                              col2=cola(count2)
+                              if(whichd(col2)==1) then
+                                 valancy=valancy+1
+                              endif
+                           end do
+                           if(valancy>valancy_keep) then
+                              valancy_keep=valancy
+                              nod_keep=col
+                           endif
+                        endif ! if(whichd(col)==2) then
+                     end do ! do count=fina(nod),fina(nod+1)-1
+
+                     col=nod_keep
+                     if(col>0) then
+                        if(whichd(col)==2) then
+                           changed=.true.
+                           w_sub_count=w_sub_count+wnod(col)
+                           whichd(col)=1
+                        endif ! if(whichd(col)==2) then
+                     endif ! if(col>0) then
+
+                  endif ! if(.not.more) then
+               endif ! if(sub_count<sub_count_aim-toler) then
+            endif ! if(whichd(nod)==1) then
+! 
+            if(whichd(nod)==2) then
+               if(w_sub_count>w_sub_count_aim+toler) then
+                  more=.true.
+                  if(.not.less) then
+                     nod_keep=0
+                     valancy_keep=0
+                     do count=fina(nod),fina(nod+1)-1
+                        col=cola(count) 
+                        if(whichd(col)==1) then
+                           valancy=0
+                           do count2=fina(col),fina(col+1)-1
+                              col2=cola(count2)
+                              if(whichd(col2)==2) then
+                                 valancy=valancy+1
+                              endif
+                           end do
+                           if(valancy>valancy_keep) then
+                              valancy_keep=valancy
+                              nod_keep=col
+                           endif
+                        endif ! if(whichd(col)==1) then
+                     end do ! do count=fina(nod),fina(nod+1)-1
+
+                     col=nod_keep
+                     if(col>0) then
+                        if(whichd(col)==1) then
+                           changed=.true.
+                           w_sub_count=w_sub_count-wnod(col)
+                           whichd(col)=2
+                        endif ! if(whichd(col)==2) then
+                     endif ! if(col>0) then
+
+                  endif ! if(.not.less) then
+               endif ! if(sub_count<sub_count_aim+toler) then
+            endif ! if(whichd(nod)==2) then
+! 
+            if(more.and.less) exit
+
+         end do ! do nod=1,nonods
+         if(more.and.less) exit
+         if(w_sub_count>w_sub_count_aim-toler) then
+            if(w_sub_count<w_sub_count_aim+toler) then
+               exit
+            endif
+         endif
+
+         if(.not.changed) then
+            do nod=1,nonods
+               if(whichd(nod)==2) then
+                  if(w_sub_count<w_sub_count_aim-toler) then
+                     less=.true.
+                     if(.not.more) then
+                        whichd(nod)=1
+                        w_sub_count=w_sub_count+wnod(nod)
+                        changed=.true.
+                     endif
+                  endif ! if(w_sub_count<w_sub_count_aim) then
+               else
+                  if(w_sub_count>w_sub_count_aim+toler) then
+                     more=.true.
+                     if(.not.less) then
+                        whichd(nod)=2
+                        w_sub_count=w_sub_count-wnod(nod)
+                        changed=.true.
+                     endif
+                  endif ! if(w_sub_count>w_sub_count_aim) then
+               endif
+               if(changed) exit
+            end do ! do nod=1,nonods
+         endif ! if(.not.changed) then
+
+         if(more.and.less) exit
+      end do ! do its=1,nonods
+
+      count=0
+      do nod=1,nonods
+         if(whichd(nod)==1) count=count+1
+      end do
+
+!      print *,'whichd(1:min(100,nonods)):',whichd(1:min(100,nonods))
+!!      print *,'wnod(1:min(100,nonods)):',wnod(1:min(100,nonods))
+!      print *,'nonods, w_sub_count, w_sub_count_aim:',nonods, w_sub_count, w_sub_count_aim
+!      print *,'no of subdomain 1 nodes, nonods:',count,nonods
+!      stop 24
+      return 
+      end subroutine alt_balance_exact
 !
 !
 !
@@ -5837,18 +6204,23 @@
 !
 !
 !
-      SUBROUTINE FIWICD(V,Whichd,Nonods,Onsubd,exact,havwnod,wnod)
+      SUBROUTINE FIWICD(V,Whichd,Nonods,Onsubd,exact,havwnod,wnod,balanced)
       IMPLICIT NONE
 !*--FIWICD2761
 !*** Start of declarations inserted by SPAG
 !*** End of declarations inserted by SPAG
 ! This sub finds whichd from the neuron values V.
 ! if exact calculate which subdomain every node belong too to exactly balance the load as far as possible. 
-      INTEGER Nonods , Onsubd , Whichd(Nonods) , sub , maxsub, havwnod
-      REAL V(Nonods*Onsubd) , wnod(nonods), maxv
-      logical exact
+      INTEGER Nonods , Onsubd , Whichd(Nonods) , havwnod
+      REAL V(Nonods*Onsubd) , wnod(nonods)
+      logical balanced
+      logical exact,bal
 ! local variables
-      INTEGER i , ii , isub, n_nods_bal
+      INTEGER i , i1, ii , isub, n_nods_bal
+      INTEGER sub , maxsub
+      REAL maxv
+      maxsub=0
+!          stop 22
       DO i = 1 , Nonods
          maxv = 0.
          DO sub = 1 , Onsubd
@@ -5859,45 +6231,70 @@
 !             V((SUB-1)*NONODS+I)=0.
          ENDDO
 !          V((MAXSUB-1)*NONODS+I)=1.
+         if(maxsub==0) stop 8221
          Whichd(i) = maxsub
       ENDDO
 
       if(exact) then ! try to make balance the number of nodes. 
          whichd=0
+         balanced=.true.
          DO isub = 1 , Onsubd
-            call critical_bal_size(isub,v((isub-1)*nonods+1),onsubd,nonods,whichd,havwnod,wnod) ! only consider subdomains that have not been filled in. 
+            call critical_bal_size(isub,v((isub-1)*nonods+1),onsubd,nonods,whichd,havwnod,wnod,bal) ! only consider subdomains that have not been filled in. 
+!            print *,'isub, nonods, sum(v((isub-1)*nonods+1:isub*nonods)):',isub, nonods,  sum(v((isub-1)*nonods+1:isub*nonods))
+            if(.not.bal) balanced=.false. 
          end do
       endif
 
 ! count no of nodes in each subdomain
       !WRITE (*,*) 'onsubd,nonods:' , Onsubd , Nonods
+      i1=0
+      II=0
       DO isub = 1 , Onsubd
          ii = 0
          DO i = 1 , Nonods
             IF ( Whichd(i).EQ.isub ) ii = ii + 1
          ENDDO
-         !WRITE (*,*) 'no of nodes in sub=' , isub , ' is =' , ii
+         i1=i1+ii
+!         WRITE (*,*) 'no of nodes in sub=' , isub , ' is =' , ii
       ENDDO
-      END
+      if(onsubd==-2) then
+         if(nonods<2000) then
+            if(ii==0) stop 28
+            if(abs(i1-2*ii)>30) then
+               DO i = 1 , -Nonods
+                  DO sub = 1 , Onsubd
+                     print *,'sub,i,V((sub-1)*Nonods+i):',sub,i,V((sub-1)*Nonods+i)
+                  end do
+               end do
+               stop 2911
+            endif
+         endif
+      endif
+      RETURN
+      END SUBROUTINE FIWICD
 !*==MAP.spg  processed by SPAG 6.72Dc at 17:05 on 27 Apr 2019
 !
 !
-      SUBROUTINE critical_bal_size(isub,v,onsubd,nonods,whichd,havwnod,wnod) ! only consider subdomains that have not been filled in.
+!
+!
+      SUBROUTINE critical_bal_size(isub,v,onsubd,nonods,whichd,havwnod,wnod,balanced) ! only consider subdomains that have not been filled in.
 ! calculate which subdomain every node belong too to exactly balance the load as far as possible. 
       implicit none
       integer isub,onsubd,nonods,havwnod
       real wnod(nonods) 
       real v(nonods)
       integer whichd(nonods)
+      logical balanced
 ! local variables...
       integer nits
-      parameter(nits=40) 
+      parameter(nits=100) 
       integer its,nod
       real n_nods_bal
       real low_crit_bal,high_crit_bal
       real crit_bal,rwsum,rcount,tol_near_one
 
       if(isub==onsubd) then
+         balanced=.true.
          do nod=1,nonods
             if(whichd(nod)==0) whichd(nod)=isub
          end do
@@ -5918,6 +6315,8 @@
       high_crit_bal=1.0    
 
       crit_bal=1.0/real(onsubd)
+
+      balanced=.false. 
 
       do its=1,nits
 
@@ -5940,21 +6339,26 @@
          !         its,low_crit_bal,high_crit_bal,isub,count,n_nods_bal
 
 !         if( (count > n_nods_bal-1.000001).and.(count < n_nods_bal+1.000001) ) exit 
-         if( (rcount > n_nods_bal-tol_near_one).and.(rcount < n_nods_bal+tol_near_one) ) exit 
+         if( (rcount > n_nods_bal-tol_near_one).and.(rcount < n_nods_bal+tol_near_one) ) then
+            balanced=.true. 
+            exit 
+         endif
 !         if( (count > n_nods_bal-0.99).and.(count < n_nods_bal+0.99) ) exit 
 !         if( (count > n_nods_bal-0.1).and.(count < n_nods_bal+0.1) ) exit 
          crit_bal=0.5*(low_crit_bal + high_crit_bal) 
       end do ! do its=1,nits
 
-      rcount=0
+      rcount=0.0
       do nod=1,nonods
          if(whichd(nod)==0) then
             if(v(nod).gt.crit_bal) then
-               rcount=rcount+1
+               rcount=rcount+1.0
                whichd(nod)=isub
             end if
          endif
       end do
+!      print *,'rcount,nonods,nonods-rcount:',rcount,nonods,nonods-rcount
+!      stop 282
 
       !print *,'final isub,nod of nodes,n_nods_bal:',isub,count,n_nods_bal
 !      !print *,'-v:',v
@@ -6025,7 +6429,9 @@
 ! = corresponding cause grid node number, otherwise,
 ! this number varies between 1 and NSHORT.
       logical adjust_small
-      parameter(adjust_small=.true.) 
+      real rsum_min
+      real toler
+      parameter(adjust_small=.true., toler=1.0e-9) 
       INTEGER count
 
       DO isub = 1 , Onsubd
@@ -6049,13 +6455,17 @@
 !
       ENDDO
 !
+      vl=max(vl,toler) ! we need to be safe it seems
+!
 !
 ! Now normalise VL
+      rsum_min=10.0
       DO nod = 1 , Nonods
          rsum = 0.
          DO isub = 1 , Onsubd
             rsum = rsum + Vl(nod+(isub-1)*Nonods)
          ENDDO
+         rsum_min = min(rsum_min, rsum) 
 !          IF(rSUM.LT.0.000001) THEN
 !            write(*,*)'rSUM,NOD:',rSUM,NOD
 !            write(*,*)'ABOUT TO DIVIDE BY ZERO'
@@ -6071,6 +6481,7 @@
          call random_number(vl)
 !         !print *,'vl:',vl
          vl = 1./real(onsubd)  + 0.01*(0.5-vl/real(onsubd))
+         vl=max(vl,toler) ! being safe
 !         !print *,'-vl:',vl
 !         stop 2011
          DO nod = 1 , Nonods
@@ -6106,7 +6517,8 @@
       INTEGER Onsubd , Nonods
       INTEGER Nchain , MXNDOM
       real toler_small
-      PARAMETER (MXNDOM=32)
+      LOGICAL MISS_OUT_2NODS
+      PARAMETER (MXNDOM=32,MISS_OUT_2NODS=.TRUE.) ! Specify domain decomp if 2 nodes or less
       PARAMETER (SUGEST=0.1, NINITS=1, toler_small=1.e-15)
 !        PARAMETER(TOLINT=0.0001,TOLER=0.001)
 !        PARAMETER(TOLINT=0.0001,TOLER=0.0001)
@@ -6122,7 +6534,7 @@
       REAL RAN1 , rran , maxdif, maxgl, wsum
       INTEGER sub , nodsub , i , j, colaco
       INTEGER Cola(Ncola) , Fina(Nonods+1)
-      INTEGER count
+      INTEGER count,SUB1,SUB2
       LOGICAL Mixup
       REAL, DIMENSION(:), ALLOCATABLE :: wwnod ! the node weights defined internally. 
 ! LODBAL=1. is the default .gt.1 then more importance
@@ -6143,6 +6555,25 @@
 ! Randomly initialise only on causest grid *******************
       !WRITE (*,*) 'inside neural'
 !      print *,'havwnod,havmat,nonods,ncola,a:',havwnod,havmat,nonods,ncola,a
+!       print *,'before amending v: sum(V(1:Nonods*Onsubd)),nonods,onsubd:', &
+!                                   sum(V(1:Nonods*Onsubd)),nonods,onsubd
+      IF(MISS_OUT_2NODS) THEN ! Specify domain decomp if 2 nodes or less
+         IF(NONODS.LE.2) THEN
+            if(nonods.ge.1) then
+               sub1=1
+               sub2=2
+               V=0.0
+               i = 1 
+               V((sub1-1)*Nonods+i) = 1. 
+               V((sub2-1)*Nonods+i) = 0. 
+               DO i = 2 , Nonods
+                  V((sub1-1)*Nonods+i) = 0. 
+                  V((sub2-1)*Nonods+i) = 1. 
+               ENDDO
+            endif
+            RETURN
+         ENDIF
+      ENDIF
 
       IF ( Mixup ) THEN
          iseed = 1
@@ -6204,7 +6635,7 @@
          end do
       ENDIF
 !      alpha = Lodbal*REAL(Onsubd)*ttvv/(REAL(Nonods)**2)
-      alpha = Lodbal*REAL(Onsubd)*ttvv/ (wsum**2) 
+      alpha = Lodbal*REAL(Onsubd)*ttvv/ max( (wsum**2), toler_small )
 !      WRITE (*,*) 'havwnod,alpha:' , havwnod,alpha
 !      WRITE (*,*) 'wwnod:',wwnod
 !      stop 2921
@@ -6259,7 +6690,7 @@
             ENDDO
 !            ttvv = ttvv - 1. ! subtract out the digonal value
          ENDIF
-         Tscale(i) = Beta*ttvv/REAL(Onsubd) ! does not depend on load balancing
+         Tscale(i) = max( Beta*ttvv/REAL(Onsubd) , toler_small ) ! does not depend on load balancing
 !          if(ttvv.lt.0.00001) then
 !            write(*,*)'problem with tscale(i),i:',tscale(i),i
 !            write(*,*)'FINA(I+1)-FINA(I):',FINA(I+1)-FINA(I)
@@ -6325,7 +6756,8 @@
 ! in multi-grid approach.
 ! B is the source for each neuron.
                      f = -ttvv + alpha*wwnod(i)*sumv(sub) + B(nodsub)
-                     stoexp(sub) = EXP(-f/Tscale(i))
+!                     stoexp(sub) = EXP(-f/Tscale(i))
+                     stoexp(sub) = EXP( max(-50.0,  min(50.0, -f/Tscale(i)) )  )
                      rsum = rsum + stoexp(sub)
                   ENDDO
 !
@@ -6343,7 +6775,9 @@
                   sumv(sub) = sumv(sub) + V(nodsub)*wwnod(i)
                ENDDO
 !
-               IF ( maxdif.LT.TOLINT ) GOTO 50
+               IF( NINITS.NE.1) THEN
+                  IF ( maxdif.LT.TOLINT ) GOTO 50
+               END IF
             ENDDO
 !         write(*,*)'ichain,ilevel,I,INITS:',ichain,ilevel,I,INITS
 !
@@ -7088,10 +7522,10 @@
  
     !  OPEN (2,FILE='rubish',STATUS='UNKNOWN')
  !     READ (2,*) indom
-      IF ( indom.NE.Ndom ) THEN
+!      IF ( indom.NE.Ndom ) THEN
   !       WRITE (*,*) 'THERE IS AN ERROR'
          STOP
-      ENDIF
+!      ENDIF
    !   READ (2,*) iincol
     !  READ (2,*) (Finsub(i),i=1,indom+1)
      ! READ (2,*) (Colsub(i),i=1,iincol)
@@ -7925,7 +8359,7 @@
 !      use FLDebug
       IMPLICIT NONE
 !     
-!     - This subroutine colours the equations and puts the results in WHICHC()
+!     - This subroutine colours the stencil (FINA,COLA) and puts the results in WHICHC()
 !     - The pointers are FINA,COLA
 !     - The number of nodes is NNOD.
 !     - NCOLOR = no of colours needed. 
@@ -7941,17 +8375,44 @@
       LOGICAL ZERO
 !
       INTEGER VAL, COUNT, COL, QCOLOR, ROW
-      INTEGER MINVAL,MAXCON,MAXCOL
-      LOGICAL DONE,FOUND
-      INTEGER I,INCOLO,NODE,ICOUNT,NQ,ITS,J,NODQ,NUM,NQTEMP,ICOL,II
+      INTEGER MINVAL,MAXCON,MAXCOL, COLOR_CHOOS
+      LOGICAL DONE,FOUND,QUICKEST
+      INTEGER I,INCOLO,NODE,ICOUNT,NQ,ITS,J,NODQ,NUM,NQTEMP,ICOL,II,JKEEP
 !
 !
       IF(ZERO) THEN
         DO I=1,NNOD
           WHICHC(I)=0
         END DO
-       ENDIF
-       INCOLO=0
+      ENDIF
+      INCOLO=0
+
+      QUICKEST=.false.!QUICK
+      IF(QUICKEST) THEN ! There is a small bug in this sub so written code around it. 
+        NCOLOR = MAXVAL(WHICHC(1:NNOD))
+        DO I = 1, NNOD
+           IF(WHICHC(I)==0) THEN ! Color node I
+
+              COLOR_CHOOS=0
+              DO QCOLOR=NCOLOR,1,-1
+                 FOUND=.FALSE.
+                 DO COUNT = FINA(I),FINA(I+1)-1
+                    J=COLA(COUNT) 
+                    IF(WHICHC(J)==QCOLOR) FOUND=.TRUE.
+                 END DO
+                 IF(.NOT.FOUND) COLOR_CHOOS=QCOLOR
+              END DO ! DO QCOLOR=NCOLOR,1,-1
+              IF(COLOR_CHOOS==0) THEN
+                 NCOLOR=NCOLOR+1
+                 WHICHC(I)=NCOLOR
+              ELSE
+                 WHICHC(I)=COLOR_CHOOS
+              ENDIF
+
+           ENDIF
+        END DO ! DO I = 1, NNOD
+        RETURN
+      ENDIF
 !
 ! - find node with min valency that is not already coloured.
 !
@@ -7990,6 +8451,7 @@
 !        ewrite(3,*)'q:',(q(iijj),iijj=1,nq)
 !
 ! - colour Q
+            QCOLOR=0
             DO J = 1, NQ
               MAXCON = -1
               IF(.NOT.QUICK) THEN
@@ -8010,6 +8472,11 @@
                END DO ! DO I = 1, NQ
              ELSE
                QCOLOR=Q(J)
+             ENDIF
+             IF(QCOLOR==0) THEN
+                PRINT *,'ITS,QUICK,J,NODE,NQ,NNOD=',ITS,QUICK,J,NODE,NQ,NNOD
+                PRINT *,'Q(J):',Q(J)
+                STOP 2894
              ENDIF
 !
 ! - Colour node QCOLOR
