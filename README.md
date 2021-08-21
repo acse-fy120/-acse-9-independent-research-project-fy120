@@ -73,10 +73,18 @@
 
 <!-- copy_over_N_files.py在压缩包中需要删除 -->
 
-### CO2
+### FPC
 <p align="center">
   <p float="left">
-     <img src="pics/FPC_CAE.m4v">
-     <a href="pics/FPC_CAE.m4v"><strong>Original CO2 PPM</strong></a>
+     <img src="pics/Fpc-Orginal.gif">
+     <a href="pics/Fpc-Orginal.gif"><strong>Original FPC</strong></a>
+     <img src="pics/FPC_SFC_CAE_64.gif">
+     <a href="pics/FPC_SFC_CAE_64.gif"><strong>FPC SFC-CAE 64 variables</strong></a>
+     <img src="pics/Fpc-Hae_64.gif">
+     <a href="pics/Fpc-Hae_64.gif"><strong>FPC SFC-HAE 64 variables</strong></a>
+     <img src="pics/Fpc-Sae_64.gif">
+     <a href="pics/Fpc-Sae_64.gif"><strong>FPC SFC-SAE 64 variables</strong></a>
+     <img src="pics/Fpc-Pod_64.gif">
+     <a href="pics/Fpc-Pod_64.gif"><strong>FPC POD 64 variables</strong></a>
   </p>
 </p>
