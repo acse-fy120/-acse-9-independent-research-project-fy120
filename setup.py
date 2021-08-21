@@ -1,7 +1,7 @@
 from setuptools import setup,find_packages
 import os
 import sys
-from distutils.core import Command
+
 
 
 with open('requirements.txt') as f:
@@ -13,15 +13,6 @@ with open('requirements.txt') as f:
 reqs = []
 for element in required:
     reqs +=[element]
-    
-
-
-# if sys.platform == 'win32' or sys.platform == 'cygwin' or sys.platform == 'msys':
-#    # on windows
-#    compile_command = 'f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new --compiler=mingw32'
-# elif sys.platform == 'linux' or sys.platform == 'linux2':
-#    # on linux
-#    compile_command = 'python3 -m numpy.f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new'
 
 
 setup(
