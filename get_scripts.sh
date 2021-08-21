@@ -1,4 +1,3 @@
-  
 #!/usr/bin/env bash
 
 # get vtktools and compile fortran library
