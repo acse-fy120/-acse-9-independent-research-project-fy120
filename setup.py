@@ -15,12 +15,12 @@ for element in required:
     
 
 
-if sys.platform == 'win32' or sys.platform == 'cygwin' or sys.platform == 'msys':
-   # on windows
-   compile_command = 'f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new --compiler=mingw32'
-elif sys.platform == 'linux' or sys.platform == 'linux2':
-   # on linux
-   compile_command = 'python3 -m numpy.f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new'
+# if sys.platform == 'win32' or sys.platform == 'cygwin' or sys.platform == 'msys':
+#    # on windows
+#    compile_command = 'f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new --compiler=mingw32'
+# elif sys.platform == 'linux' or sys.platform == 'linux2':
+#    # on linux
+#    compile_command = 'python3 -m numpy.f2py -c space_filling_decomp_new.f90 -m space_filling_decomp_new'
 
 
 setup(
