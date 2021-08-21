@@ -144,7 +144,6 @@ def get_sfc_curves_from_coords(coords, num):
     return curve_lists, inv_lists
 
 
-
 ####################################Functions used in Flow past cylinder####################################
 def saveIndex(path_train, path_valid, path_test,train_index, valid_index, test_index):
     # The indexes of training, valid and test dataset are generated randomly. The indexes 
