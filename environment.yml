@@ -1,4 +1,4 @@
-name: sfc-cae
+name: ACSE9
 channels:
   - conda-forge
   - defaults

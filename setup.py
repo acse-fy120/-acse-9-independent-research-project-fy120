@@ -1,6 +1,7 @@
 from setuptools import setup,find_packages
 import os
 import sys
+from distutils.core import Command
 
 
 with open('requirements.txt') as f:
@@ -32,6 +33,5 @@ setup(
     author_email='fan.yang20@imperial.ac.uk',
     install_requires=reqs,
     test_suite='tests',
-    packages=['fpc_methods']
-
+    # packages=['fpc_methods']
 )
