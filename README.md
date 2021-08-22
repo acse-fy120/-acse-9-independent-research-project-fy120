@@ -103,6 +103,8 @@
      <img src="pics/Fpc-Sae_64.gif">
      <a href="pics/Fpc-Sae_64.gif"><strong>FPC SFC-SAE 64 variables</strong></a>
      <img src="pics/Fpc-Pod_64.gif">
-     <a href="pics/Fpc-Pod_64.gif"><strong>FPC POD 64 variables</strong></a>
+     <a href="pics/Fpc-Pod_64.gif"><strong>FPC POD 64 variables</strong><a>
+     <img src="pics/FPC-SVDAE_64.gif">
+     <a href="pics/FPC-SVDAE_64.gif"><strong>FPC SVD-AE 64 variables</strong><a>
   </p>
 </p>
