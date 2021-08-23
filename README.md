@@ -47,14 +47,14 @@
     <li>
       <a href="#project-description">Project Description</a>
     </li>
-    <li>
+    <!-- <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#Dependencies">Prerequisites & Dependencies</a></li>
         <li><a href="#Installation">Installation</a></li>
       </ul>
-    </li>
-    <li><a href="#Template-Notebooks">Colab Notebooks</a>
+    </li> -->
+    <!-- <li><a href="#Template-Notebooks">Colab Notebooks</a>
       <ul>
         <li><a href="#advecting-block">Advection of a Block/Gaussian  (128 * 128 Structured Grid)</a></li>
         <li><a href="#FPC-DG">Flow Past Cylinder - DG Mesh (2000 snapshots, 20550 Nodes, 2/3 components)</a></li>
@@ -62,7 +62,7 @@
         <li><a href="#CO2"> CO2 in the room - CG Mesh (455 snapshots, 148906 Nodes, 4 components)</a></li>
         <li><a href="#Slugflow"> Slugflow - DG mesh (1706 snapshots, 1342756 Nodes, 4 components)</a></li>
       </ul>   
-    </li>
+    </li> -->
     <li><a href="#License">License</a></li>
     <li><a href="#Testing">Testing</a></li>
     <li><a href="#Contact">Contact</a></li>
