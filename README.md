@@ -49,11 +49,11 @@
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#download">Download</a></li>
+        <li><a href="#directory-tree">Directory tree</a></li>
       </ul>
-          <li><a href="#Download"></a>Download</li>
-          <li><a href="#Directory-tree"> Directory tree </a></li>
-      </ul>
-    </li> 
+    </li>
     <li><a href="#Template-Notebooks">Colab Notebooks</a>
       <ul>
         <li><a href="#Burgers-equation">Burgers equation</a></li>
