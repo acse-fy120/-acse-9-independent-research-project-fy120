@@ -47,22 +47,21 @@
     <li>
       <a href="#project-description">Project Description</a>
     </li>
-    <!-- <li>
+    <li>
       <a href="#getting-started">Getting Started</a>
+      <li><a href="#Download"></a>Download</li>
+      <li><a href="#Directory-tree"> Directory tree </a></li>
+    </li> 
+    <li><a href="#Template-Notebooks">Colab Notebooks</a>
       <ul>
-        <li><a href="#Dependencies">Prerequisites & Dependencies</a></li>
-        <li><a href="#Installation">Installation</a></li>
-      </ul>
-    </li> -->
-    <!-- <li><a href="#Template-Notebooks">Colab Notebooks</a>
-      <ul>
-        <li><a href="#advecting-block">Advection of a Block/Gaussian  (128 * 128 Structured Grid)</a></li>
-        <li><a href="#FPC-DG">Flow Past Cylinder - DG Mesh (2000 snapshots, 20550 Nodes, 2/3 components)</a></li>
-        <li><a href="#FPC-CG">Flow Past Cylinder - CG Mesh (2000 snapshots, 3571 Nodes, 2 components) </a></li>
-        <li><a href="#CO2"> CO2 in the room - CG Mesh (455 snapshots, 148906 Nodes, 4 components)</a></li>
-        <li><a href="#Slugflow"> Slugflow - DG mesh (1706 snapshots, 1342756 Nodes, 4 components)</a></li>
+        <li><a href="#Burgers-equation">Burgers equation</a></li>
+        <li><a href="#FPC-SFC-CAE">Flow Past Cylinder - SFC-CAE</a></li>
+        <li><a href="#FPC-SFC-HAE">Flow Past Cylinder - SFC-HAE </a></li>
+        <li><a href="#FPC-SFC-CAE"> Flow Past Cylinder - SFC-SAE</a></li>
+        <li><a href="#FPC-SVD-AE"> Flow Past Cylinder - SVD-AE</a></li>
+        <li><a href="#FPC-SFC-POD"> Flow Past Cylinder - POD</a></li>
       </ul>   
-    </li> -->
+    </li>
     <li><a href="#License">License</a></li>
     <li><a href="#Testing">Testing</a></li>
     <li><a href="#Contact">Contact</a></li>
@@ -72,9 +71,23 @@
 
 
 <!-- copy_over_N_files.py在压缩包中需要删除 -->
+## Project Description
+To investigate the application of the dimensionality reduction methods in fluid dynamics, this project implements and compares many dimensionality reduction methods including proper orthogonal decomposition(POD), fully-connected autoencoder (FC-AE), convolutional autoencoder (CAE), space-filling curve - convolutional autoencoder (SFC-CAE), hierarchical autoencoder (HAE) and sequential autoencoder (SAE). Moreover, the novel space-filling curve-hierarchical autoencoder (SFC-HAE) is proposed. The mentioned methods are assessed with two fluid solutions, namely: (1) burgers equation, (2) flow past cylinder, in terms of mean square error (MSE) and computation time. 
+The project is based on the wokr of previous year https://arxiv.org/abs/2011.14820,https://github.com/ImperialCollegeLondon/SFC-CAE and paper https://arxiv.org/abs/2006.06977.
+
+## Getting Started
+### Download
+
+### Directory tree
+
+#### Directory tree in Colab
 
 
+#### Directory tree in local computer
+
+## Template Notebooks
 ### Burgers equation
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/burgers equation_methods/Burgers equation.ipynb)
 <p align="center">
   <p float="left">
      <img src="pics/original_BE.gif">
@@ -104,9 +117,9 @@
      <a href="pics/Fpc-Hae_64.gif"><strong>FPC SFC-HAE 64 variables</strong></a>
      <img src="pics/Fpc-Sae_64.gif">
      <a href="pics/Fpc-Sae_64.gif"><strong>FPC SFC-SAE 64 variables</strong></a>
-     <img src="pics/Fpc-Pod_64.gif">
-     <a href="pics/Fpc-Pod_64.gif"><strong>FPC POD 64 variables</strong><a>
      <img src="pics/FPC-SVDAE_64.gif">
      <a href="pics/FPC-SVDAE_64.gif"><strong>FPC SVD-AE 64 variables</strong><a>
+     <img src="pics/Fpc-Pod_64.gif">
+     <a href="pics/Fpc-Pod_64.gif"><strong>FPC POD 64 variables</strong><a>
   </p>
 </p>

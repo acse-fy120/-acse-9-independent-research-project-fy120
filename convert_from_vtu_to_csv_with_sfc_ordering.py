@@ -11,10 +11,9 @@ import time
 
 #----------------------------------------------------------------------------------------------
 # get a mesh from the results vtus
-#path = '/home/cheaney/Results/nirom_test_fpc_nPOD_20_nSnap_100/snapshots/'
 
 def convert_vtu_to_csv(path):
-    # path = '../data/FPC_Re3900_DG_old'
+    # path = '../data/FPC_Re3900_DG_new'
     filename = path + 'fpc_0.vtu' # this file will do (all files have the same mesh)
     vtu_data = vtktools.vtu(filename)
     coords = vtu_data.GetLocations()  # Returns an array with the locations of the nodes
@@ -22,7 +21,7 @@ def convert_vtu_to_csv(path):
     
     # sfc settings    
     findm,colm,ncolm = sfc.form_spare_matric_from_pts( coords, nNodes )
-    ncurve = 2
+    ncurve = 2  # This the number of the SFC ordering. It can be set by the user
     graph_trim = -10  # has always been set at -10
     starting_node = 0 # =0 do not specifiy a starting node, otherwise, specify the starting node
     colm1 = np.ones((ncolm),dtype = 'int')
@@ -46,7 +45,7 @@ def convert_vtu_to_csv(path):
     t_read_in = 0
 
     # data for training, validation and test
-    nTotalExamples = 2000 # maximum is 1000 for this data set
+    nTotalExamples = 2000 # maximum is 2000 for this data set
 
     #cwd = os.getcwd()
     if not os.path.isdir('new_FPC_csv'):
@@ -54,8 +53,7 @@ def convert_vtu_to_csv(path):
     #os.chdir('csv_data') # will overwrite files in results
 
     for data_i in range(nTotalExamples):
-        t0 = time.time()    
-        # path = '/home/cheaney/Results/nirom_test_fpc_nPOD_20_nSnap_100/snapshots/'
+        t0 = time.time()
         filename = path + 'fpc_' + str(data_i) + '.vtu'
         vtu_data = vtktools.vtu(filename)
         # D[:,0] and D[:,1] store order1 and order2, D[:,2] store velocity
@@ -78,8 +76,6 @@ def convert_vtu_to_csv(path):
         t_save_to_csv = t_save_to_csv + t1 - t0
 
         print("data loaded", data_i)
-
-
 
     print('Time loading data', t_read_in)
     print('Time to write to csv', t_save_to_csv)
