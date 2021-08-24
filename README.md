@@ -87,7 +87,7 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
 
 ## Template Notebooks
 ### Burgers equation
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/burgers_equation_methods/Burgers equation.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/burgers_equation_methods/Burgers_equation.ipynb)
 <p align="center">
   <p float="left">
      <img src="pics/original_BE.gif">
