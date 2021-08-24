@@ -61,7 +61,7 @@
             <a href="#Flow-past-cylinder">Flow past cylinder</a>
             <ul>
               <li><a href="#FPC-SFC-CAE">SFC-CAE</a></li>
-              li><a href="#FPC-SFC-HAE">SFC-HAE </a></li>
+              <li><a href="#FPC-SFC-HAE">SFC-HAE </a></li>
               <li><a href="#FPC-SFC-CAE">SFC-SAE</a></li>
               <li><a href="#FPC-SVD-AE">SVD-AE</a></li>
               <li><a href="#FPC-SFC-POD">POD</a></li>
@@ -113,7 +113,7 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
 </p>
 
 
-### FPC
+### Flow past cylinder
 <p align="center">
   <p float="left">
      <img src="pics/Fpc-Orginal.gif">
