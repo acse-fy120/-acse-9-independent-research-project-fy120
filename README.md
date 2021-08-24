@@ -136,7 +136,7 @@ The FPC_Re3900_DG_new is the folder that contain the vtu files which is decompre
 </p>
 
 #### SFC-CAE
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_CAE/FPC_SFC_CAE_Sumary.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_CAE/FPC_SFC_CAE_Summary.ipynb)
 <p align="center">
   <p float="left">
      <img src="pics/FPC_SFC_CAE_64.gif">
@@ -145,7 +145,7 @@ The FPC_Re3900_DG_new is the folder that contain the vtu files which is decompre
 </p>
 
 #### SFC-HAE
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_HAE/FPC_SFC_HAE_Sumary.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_HAE/FPC_SFC_HAE_Summary.ipynb)
 <p align="center">
   <p float="left">
      <img src="pics/Fpc-Hae_64.gif">
@@ -154,7 +154,7 @@ The FPC_Re3900_DG_new is the folder that contain the vtu files which is decompre
 </p>
 
 #### SFC-SAE
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_SAE/FPC_SFC_SAE_Sumary.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_SAE/FPC_SFC_SAE_Summary.ipynb)
 <p align="center">
   <p float="left">
      <img src="pics/Fpc-Sae_64.gif">
