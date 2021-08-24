@@ -49,8 +49,10 @@
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
-      <li><a href="#Download"></a>Download</li>
-      <li><a href="#Directory-tree"> Directory tree </a></li>
+      </ul>
+          <li><a href="#Download"></a>Download</li>
+          <li><a href="#Directory-tree"> Directory tree </a></li>
+      </ul>
     </li> 
     <li><a href="#Template-Notebooks">Colab Notebooks</a>
       <ul>
@@ -107,6 +109,17 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
 
 
 ### FPC
+#### SFC-CAE
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_CAE/FPC_SFC_CAE_Sumary.ipynb)
+#### SFC-HAE
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_HAE/FPC_SFC_HAE_Sumary.ipynb)
+#### SFC-SAE
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_SAE/FPC_SFC_SAE_Sumary.ipynb)
+#### SVD-AE
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/FPC_SVD_AE_random.ipynb)
+#### POD
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/FPC_POD.ipynb)
+
 <p align="center">
   <p float="left">
      <img src="pics/Fpc-Orginal.gif">
