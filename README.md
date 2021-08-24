@@ -84,6 +84,11 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
 
 ## Getting Started
 ### Download
+1. Clone the repository:
+```sh
+$ git clone https://github.com/acse-fy120/acse-9-independent-research-project-fy120
+```
+2. Upload to the Google drive using Colab to open the ipynb files.
 
 ### Directory tree
 
