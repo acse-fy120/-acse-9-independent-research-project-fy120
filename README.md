@@ -57,11 +57,16 @@
     <li><a href="#Template-Notebooks">Colab Notebooks</a>
       <ul>
         <li><a href="#Burgers-equation">Burgers equation</a></li>
-        <li><a href="#FPC-SFC-CAE">Flow Past Cylinder - SFC-CAE</a></li>
-        <li><a href="#FPC-SFC-HAE">Flow Past Cylinder - SFC-HAE </a></li>
-        <li><a href="#FPC-SFC-CAE"> Flow Past Cylinder - SFC-SAE</a></li>
-        <li><a href="#FPC-SVD-AE"> Flow Past Cylinder - SVD-AE</a></li>
-        <li><a href="#FPC-SFC-POD"> Flow Past Cylinder - POD</a></li>
+        <li>
+            <a href="#Flow-past-cylinder">Flow past cylinder</a>
+            <ul>
+              <li><a href="#FPC-SFC-CAE">SFC-CAE</a></li>
+              li><a href="#FPC-SFC-HAE">SFC-HAE </a></li>
+              <li><a href="#FPC-SFC-CAE">SFC-SAE</a></li>
+              <li><a href="#FPC-SVD-AE">SVD-AE</a></li>
+              <li><a href="#FPC-SFC-POD">POD</a></li>
+            </ul>
+        </li>
       </ul>   
     </li>
     <li><a href="#License">License</a></li>
