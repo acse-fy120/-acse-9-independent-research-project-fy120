@@ -88,16 +88,17 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
 ### Directory tree
 
 #### Directory tree in Colab
+Please configure the file on the Colab according to the directory tree in directory tree in local computer.txt in directory tree folder.
+The link to download FPC_new_random_test.pt, FPC_new_random_total.pt, FPC_new_random_train.pt, FPC_new_random_valid.pt is https://drive.google.com/drive/folders/1UyJZ4ZqApOTnUIV-VwmIGoOIcxstq8VM?usp=sharing.
 
+The most important csv folder and pkl folder of each method have been upload to this repertory. The csv folder is used to store the MSE of training data and validation data. The pkl folder store the trained model. The decoded_data/decoded folder and Error_data folder used in SAE store the output and residual of the first network respectively. The mode/mode_new folder used in HAE store the output of the encoder of the first network. Due to their large memory, they can't be upload to Github. However, the user can generate them by using the trained model by themself. The csv_data is the csv file of FPC_Re3900_DG_new, which can be gnerated using Convert_vtu_to_csv.ipynb.
 
 #### Directory tree in local computer
 The code about flow past cylinder data post-processing is preferable to be run on the local computer with Visual Studio Code because the file of vtu could be opened with Paraview on the local computer.
-Please configure the file on the local computer according to the following directory tree.
-'''bash
-│  convert_csv_to_vtu.py
-│  
-└─FPC_Re3900_DG_new
-'''
+Please configure the file on the local computer according to the directory tree in local computer.txt in directory tree folder.
+
+The FPC_Re3900_DG_new is the folder that contain the vtu files which is decompressed from FPC_Re3900_DG_new.zip. The link to download the FPC_Re3900_DG_new.zip is https://drive.google.com/file/d/1kmI5NIZD5sTJnJzHNXMrg3fVQLcEWb81/view?usp=sharing.
+
 
 
 ## Template Notebooks
