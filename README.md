@@ -109,8 +109,20 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
 
 
 ### FPC
+<p align="center">
+  <p float="left">
+     <img src="pics/Fpc-Orginal.gif">
+     <a href="pics/Fpc-Orginal.gif"><strong>Original FPC</strong></a>
+  </p>
+</p>
 #### SFC-CAE
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_CAE/FPC_SFC_CAE_Sumary.ipynb)
+<p align="center">
+  <p float="left">
+     <img src="pics/FPC_SFC_CAE_64.gif">
+     <a href="pics/FPC_SFC_CAE_64.gif"><strong>FPC SFC-CAE 64 variables</strong></a>
+  </p>
+</p>
 #### SFC-HAE
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/acse-fy120/acse-9-independent-research-project-fy120/blob/main/fpc_methods/SFC_HAE/FPC_SFC_HAE_Sumary.ipynb)
 #### SFC-SAE
@@ -124,7 +136,7 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
   <p float="left">
      <img src="pics/Fpc-Orginal.gif">
      <a href="pics/Fpc-Orginal.gif"><strong>Original FPC</strong></a>
-     <img src="pics/FPC_SFC_CAE_64.gif">
+     <!-- <img src="pics/FPC_SFC_CAE_64.gif">
      <a href="pics/FPC_SFC_CAE_64.gif"><strong>FPC SFC-CAE 64 variables</strong></a>
      <img src="pics/Fpc-Hae_64.gif">
      <a href="pics/Fpc-Hae_64.gif"><strong>FPC SFC-HAE 64 variables</strong></a>
@@ -133,6 +145,6 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
      <img src="pics/FPC-SVDAE_64.gif">
      <a href="pics/FPC-SVDAE_64.gif"><strong>FPC SVD-AE 64 variables</strong><a>
      <img src="pics/Fpc-Pod_64.gif">
-     <a href="pics/Fpc-Pod_64.gif"><strong>FPC POD 64 variables</strong><a>
+     <a href="pics/Fpc-Pod_64.gif"><strong>FPC POD 64 variables</strong><a> -->
   </p>
 </p>
