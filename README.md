@@ -91,6 +91,14 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
 
 
 #### Directory tree in local computer
+The code about flow past cylinder data post-processing is preferable to be run on the local computer with Visual Studio Code because the file of vtu could be opened with Paraview on the local computer.
+Please configure the file on the local computer according to the following directory tree.
+
+│  convert_csv_to_vtu.py
+│  tree.txt
+│  
+└─FPC_Re3900_DG_new
+
 
 ## Template Notebooks
 ### Burgers equation
@@ -165,3 +173,15 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
      <a href="pics/Fpc-Pod_64.gif"><strong>FPC POD 64 variables</strong><a>
   </p>
 </p>
+
+## License
+Under the  [MIT Licence](https://github.com/acse-fy120/acse-9-independent-research-project-fy120/blob/main/LICENSE) License.
+
+
+## Contact
+* fy120@imperial.ac.uk or yangfan9806@gmail.com
+
+## Acknowledgements
+Many thanks to my supervisors:
+* Dr. Claire Heaney
+* Prof. Christopher Pain 
