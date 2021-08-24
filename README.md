@@ -93,11 +93,11 @@ The project is based on the wokr of previous year https://arxiv.org/abs/2011.148
 #### Directory tree in local computer
 The code about flow past cylinder data post-processing is preferable to be run on the local computer with Visual Studio Code because the file of vtu could be opened with Paraview on the local computer.
 Please configure the file on the local computer according to the following directory tree.
-
+'''bash
 │  convert_csv_to_vtu.py
-│  tree.txt
 │  
 └─FPC_Re3900_DG_new
+'''
 
 
 ## Template Notebooks
