@@ -1,3 +1,8 @@
+"""
+The file is used to convert vtu file to csv file. It is provided by Dr Claire Heaney
+"""
+
+
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
@@ -13,6 +18,16 @@ import time
 # get a mesh from the results vtus
 
 def convert_vtu_to_csv(path):
+    """
+    This function is used to calculate the space-filling curve for the mesh and 
+    convert to csv format
+
+    Parameters
+    ----------
+    path : string
+         It is the path that vtu file has stored
+        
+    """
     # path = '../data/FPC_Re3900_DG_new'
     filename = path + 'fpc_0.vtu' # this file will do (all files have the same mesh)
     vtu_data = vtktools.vtu(filename)
@@ -79,4 +94,3 @@ def convert_vtu_to_csv(path):
 
     print('Time loading data', t_read_in)
     print('Time to write to csv', t_save_to_csv)
-

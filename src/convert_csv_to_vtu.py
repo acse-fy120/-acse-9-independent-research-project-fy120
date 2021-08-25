@@ -1,3 +1,8 @@
+"""
+The file is used to convert csv file to vtu file. It is provided by Dr Claire Heaney
+"""
+
+
 
 import numpy as np
 import vtktools
@@ -5,7 +10,16 @@ import os
 
 
 def get_clean_vtu(filename):
-    "Removes fields and arrays from a vtk file, leaving the coordinates/connectivity information."
+    """
+    This function is used to remove fields and arrays from a vtk file, leaving the 
+    coordinates/connectivity information.
+
+    Parameters
+    ----------
+    filename : string
+        The name of the vtu file
+        
+    """
     vtu_data = vtktools.vtu(filename)
     clean_vtu = vtktools.vtu()
     clean_vtu.ugrid.DeepCopy(vtu_data.ugrid)
