@@ -1,5 +1,5 @@
 """
-The file is used to convert csv file to vtu file. It is provided by Dr Claire Heaney
+The file is used to convert csv file to vtu file. It is provided by Dr Claire Heaney.
 """
 
 
