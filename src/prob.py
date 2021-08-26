@@ -1,5 +1,5 @@
 """
-This file is used to get the velocity at a fixed point in vtu file. It is provided by Claire Heaney.
+This file is used to get the velocity at a fixed point in vtu file. It is provided by Dr. Claire Heaney.
 """
 
 
